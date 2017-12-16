@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
+
 /**
  * @author sdyang
  * @create 2017-12-12 16:22
@@ -23,7 +25,7 @@ public class UserController {
     @RequestMapping(value = "/test",method = {RequestMethod.GET})
     @ResponseBody
     public String index(Model model) {
-       UserModel user = userService.selectById(1);
+       List<UserModel> user = userService.findAll();
         return JsonUtil.toJSONString(user);
     }
 }

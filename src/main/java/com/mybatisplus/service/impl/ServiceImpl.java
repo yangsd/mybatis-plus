@@ -88,7 +88,7 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean insertBatch(List<T> entityList) {
+    public boolean insert(List<T> entityList) {
         return insertBatch(entityList, 30);
     }
 
@@ -130,7 +130,7 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {
      * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
-    public boolean insertOrUpdate(T entity) {
+    public boolean save(T entity) {
         if (null != entity) {
             Class<?> cls = entity.getClass();
             TableInfo tableInfo = TableInfoHelper.getTableInfo(cls);
@@ -174,7 +174,7 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean insertOrUpdateBatch(List<T> entityList) {
+    public boolean save(List<T> entityList) {
         return insertOrUpdateBatch(entityList, 30);
     }
 
@@ -210,7 +210,7 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {
             int size = entityList.size();
             for (int i = 0; i < size; i++) {
                 if (selective) {
-                    insertOrUpdate(entityList.get(i));
+                    save(entityList.get(i));
                 } else {
                     insertOrUpdateAllColumn(entityList.get(i));
                 }
@@ -244,8 +244,8 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteBatchIds(List<? extends Serializable> idList) {
-        return retBool(baseMapper.deleteBatchIds(idList));
+    public boolean deleteByIds(List<? extends Serializable> idList) {
+        return retBool(baseMapper.deleteByIds(idList));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -315,19 +315,24 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {
         return true;
     }
 
-    public T selectById(Serializable id) {
+    public T findById(Serializable id) {
         return baseMapper.selectById(id);
     }
 
-    public List<T> selectBatchIds(List<? extends Serializable> idList) {
-        return baseMapper.selectBatchIds(idList);
+    @Override
+    public List<T> findAll() {
+        return baseMapper.selectAll();
+    }
+
+    public List<T> findByIds(List<? extends Serializable> idList) {
+        return baseMapper.selectByIds(idList);
     }
 
     public List<T> selectByMap(Map<String, Object> columnMap) {
         return baseMapper.selectByMap(columnMap);
     }
 
-    public T selectOne(Wrapper<T> wrapper) {
+    public T findOne(Wrapper<T> wrapper) {
         return SqlHelper.getObject(baseMapper.selectList(wrapper));
     }
 
@@ -339,7 +344,7 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {
         return SqlHelper.getObject(baseMapper.selectObjs(wrapper));
     }
 
-    public int selectCount(Wrapper<T> wrapper) {
+    public int count(Wrapper<T> wrapper) {
         return SqlHelper.retCount(baseMapper.selectCount(wrapper));
     }
 
@@ -347,8 +352,8 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {
         return baseMapper.selectList(wrapper);
     }
 
-    public Page<T> selectPage(Page<T> page) {
-        return selectPage(page, Condition.EMPTY);
+    public Page<T> selectByPage(Page<T> page) {
+        return selectByPage(page, Condition.EMPTY);
     }
 
     public List<Map<String, Object>> selectMaps(Wrapper<T> wrapper) {
@@ -365,7 +370,7 @@ public class ServiceImpl<M extends BaseMapper<T>, T> implements IService<T> {
         return page;
     }
 
-    public Page<T> selectPage(Page<T> page, Wrapper<T> wrapper) {
+    public Page<T> selectByPage(Page<T> page, Wrapper<T> wrapper) {
         SqlHelper.fillWrapper(page, wrapper);
         page.setRecords(baseMapper.selectPage(page, wrapper));
         return page;

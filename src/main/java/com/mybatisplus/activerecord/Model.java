@@ -50,7 +50,7 @@ public abstract class Model<T extends Model> implements Serializable {
      * </p>
      */
     @Transactional
-    public boolean insertOrUpdate() {
+    public boolean save() {
         if (StringUtils.checkValNull(pkVal())) {
             // insert
             return insert();
@@ -71,7 +71,7 @@ public abstract class Model<T extends Model> implements Serializable {
      * @return
      */
     @Transactional
-    public boolean deleteById(Serializable id) {
+    public boolean delete(Serializable id) {
         return SqlHelper.retBool(sqlSession().delete(sqlStatement(SqlMethod.DELETE_BY_ID), id));
     }
 
@@ -83,11 +83,11 @@ public abstract class Model<T extends Model> implements Serializable {
      * @return
      */
     @Transactional
-    public boolean deleteById() {
+    public boolean delete() {
         if (StringUtils.checkValNull(pkVal())) {
             throw new MybatisPlusException("deleteById primaryKey is null.");
         }
-        return deleteById(this.pkVal());
+        return delete(this.pkVal());
     }
 
     /**
@@ -191,7 +191,7 @@ public abstract class Model<T extends Model> implements Serializable {
      *
      * @return
      */
-    public List<T> selectAll() {
+    public List<T> findAll() {
         return sqlSession().selectList(sqlStatement(SqlMethod.SELECT_LIST));
     }
 
@@ -203,7 +203,7 @@ public abstract class Model<T extends Model> implements Serializable {
      * @param id 主键ID
      * @return
      */
-    public T selectById(Serializable id) {
+    public T findById(Serializable id) {
         return sqlSession().selectOne(sqlStatement(SqlMethod.SELECT_BY_ID), id);
     }
 
@@ -214,11 +214,11 @@ public abstract class Model<T extends Model> implements Serializable {
      *
      * @return
      */
-    public T selectById() {
+    public T findById() {
         if (StringUtils.checkValNull(pkVal())) {
             throw new MybatisPlusException("selectById primaryKey is null.");
         }
-        return selectById(this.pkVal());
+        return findById(this.pkVal());
     }
 
     /**
@@ -230,7 +230,7 @@ public abstract class Model<T extends Model> implements Serializable {
      * @return
      */
 
-    public List<T> selectList(Wrapper wrapper) {
+    public List<T> find(Wrapper wrapper) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("ew", wrapper);
         return sqlSession().selectList(sqlStatement(SqlMethod.SELECT_LIST), map);
@@ -245,8 +245,8 @@ public abstract class Model<T extends Model> implements Serializable {
      * @param args
      * @return
      */
-    public List<T> selectList(String whereClause, Object... args) {
-        return selectList(Condition.create().where(whereClause, args));
+    public List<T> find(String whereClause, Object... args) {
+        return find(Condition.create().where(whereClause, args));
     }
 
     /**
@@ -257,8 +257,8 @@ public abstract class Model<T extends Model> implements Serializable {
      * @param wrapper
      * @return
      */
-    public T selectOne(Wrapper wrapper) {
-        return SqlHelper.getObject(selectList(wrapper));
+    public T findOne(Wrapper wrapper) {
+        return SqlHelper.getObject(find(wrapper));
     }
 
     /**
@@ -270,8 +270,8 @@ public abstract class Model<T extends Model> implements Serializable {
      * @param args
      * @return
      */
-    public T selectOne(String whereClause, Object... args) {
-        return selectOne(Condition.create().where(whereClause, args));
+    public T findOne(String whereClause, Object... args) {
+        return findOne(Condition.create().where(whereClause, args));
     }
 
     /**
@@ -283,7 +283,7 @@ public abstract class Model<T extends Model> implements Serializable {
      * @param wrapper
      * @return
      */
-    public Page<T> selectPage(Page<T> page, Wrapper<T> wrapper) {
+    public Page<T> findByPage(Page<T> page, Wrapper<T> wrapper) {
         Map<String, Object> map = new HashMap<String, Object>();
         SqlHelper.fillWrapper(page, wrapper);
         map.put("ew", wrapper);
@@ -303,8 +303,8 @@ public abstract class Model<T extends Model> implements Serializable {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public Page<T> selectPage(Page<T> page, String whereClause, Object... args) {
-        return selectPage(page, Condition.create().where(whereClause, args));
+    public Page<T> findByPage(Page<T> page, String whereClause, Object... args) {
+        return findByPage(page, Condition.create().where(whereClause, args));
     }
 
     /**
@@ -316,8 +316,8 @@ public abstract class Model<T extends Model> implements Serializable {
      * @param args        查询条件值
      * @return
      */
-    public int selectCount(String whereClause, Object... args) {
-        return selectCount(Condition.create().where(whereClause, args));
+    public int count(String whereClause, Object... args) {
+        return count(Condition.create().where(whereClause, args));
     }
 
     /**
@@ -328,7 +328,7 @@ public abstract class Model<T extends Model> implements Serializable {
      * @param wrapper
      * @return
      */
-    public int selectCount(Wrapper wrapper) {
+    public int count(Wrapper wrapper) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("ew", wrapper);
         return SqlHelper.retCount(sqlSession().<Integer>selectOne(sqlStatement(SqlMethod.SELECT_COUNT), map));

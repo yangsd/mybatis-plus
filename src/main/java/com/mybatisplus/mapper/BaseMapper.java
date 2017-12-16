@@ -79,7 +79,7 @@ public interface BaseMapper<T> {
      * @param idList 主键ID列表
      * @return int
      */
-    Integer deleteBatchIds(List<? extends Serializable> idList);
+    Integer deleteByIds(List<? extends Serializable> idList);
 
     /**
      * <p>
@@ -122,6 +122,13 @@ public interface BaseMapper<T> {
      */
     T selectById(Serializable id);
 
+
+    /**
+     * 查询所有数据
+     * @return
+     */
+    List<T> selectAll();
+
     /**
      * <p>
      * 查询（根据ID 批量查询）
@@ -130,7 +137,7 @@ public interface BaseMapper<T> {
      * @param idList 主键ID列表
      * @return List<T>
      */
-    List<T> selectBatchIds(List<? extends Serializable> idList);
+    List<T> selectByIds(List<? extends Serializable> idList);
 
     /**
      * <p>

@@ -125,6 +125,7 @@ public class AutoSqlInjector implements ISqlInjector {
         this.injectSelectMapsSql(SqlMethod.SELECT_MAPS, mapperClass, modelClass, table);
         this.injectSelectMapsSql(SqlMethod.SELECT_MAPS_PAGE, mapperClass, modelClass, table);
         this.injectSelectObjsSql(SqlMethod.SELECT_OBJS, mapperClass, modelClass, table);
+        this.injectFindAllSql(mapperClass,modelClass,table);
         /* 自定义方法 */
         this.inject(configuration, builderAssistant, mapperClass, modelClass, table);
     }
@@ -360,6 +361,22 @@ public class AutoSqlInjector implements ISqlInjector {
             sqlSource = new RawSqlSource(configuration, String.format(sqlMethod.getSql(), sqlSelectColumns(table, false),
                     table.getTableName(), table.getKeyColumn(), table.getKeyProperty()), Object.class);
         }
+        this.addSelectMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource, modelClass, table);
+    }
+
+    /**
+     * 查询全部数据
+     * @param mapperClass
+     * @param modelClass
+     * @param table
+     * @author sdyang
+     * @date 2017-12-16 11:27
+     */
+    protected void injectFindAllSql(Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.SELECT_ALL;
+        SqlSource sqlSource  = new RawSqlSource(configuration, String.format(sqlMethod.getSql(),
+                table.getTableName(), table.getKeyColumn(), table.getKeyProperty()), Object.class);
+
         this.addSelectMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource, modelClass, table);
     }
 

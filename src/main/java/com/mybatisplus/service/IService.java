@@ -10,12 +10,10 @@ import java.util.Map;
 
 
 /**
- * <p>
- * 顶级 Service
- * </p>
  *
- * @author hubin
- * @Date 2016-04-20
+ * @param <T>
+ * @author sdyang
+ * @date 2017-12-16
  */
 public interface IService<T> {
 
@@ -47,7 +45,7 @@ public interface IService<T> {
      * @param entityList 实体对象列表
      * @return boolean
      */
-    boolean insertBatch(List<T> entityList);
+    boolean insert(List<T> entityList);
 
     /**
      * <p>
@@ -68,7 +66,7 @@ public interface IService<T> {
      * @param entityList 实体对象列表
      * @return boolean
      */
-    boolean insertOrUpdateBatch(List<T> entityList);
+    boolean save(List<T> entityList);
 
     /**
      * <p>
@@ -138,7 +136,7 @@ public interface IService<T> {
      * @param idList 主键ID列表
      * @return boolean
      */
-    boolean deleteBatchIds(List<? extends Serializable> idList);
+    boolean deleteByIds(List<? extends Serializable> idList);
 
     /**
      * <p>
@@ -221,7 +219,7 @@ public interface IService<T> {
      * @param entity 实体对象
      * @return boolean
      */
-    boolean insertOrUpdate(T entity);
+    boolean save(T entity);
 
     /**
      * 插入或修改一条记录的全部字段
@@ -239,7 +237,13 @@ public interface IService<T> {
      * @param id 主键ID
      * @return T
      */
-    T selectById(Serializable id);
+    T findById(Serializable id);
+
+    /**
+     * 查询所有数据
+     * @return
+     */
+    List<T> findAll();
 
     /**
      * <p>
@@ -249,7 +253,7 @@ public interface IService<T> {
      * @param idList 主键ID列表
      * @return List<T>
      */
-    List<T> selectBatchIds(List<? extends Serializable> idList);
+    List<T> findByIds(List<? extends Serializable> idList);
 
     /**
      * <p>
@@ -269,7 +273,7 @@ public interface IService<T> {
      * @param wrapper 实体对象
      * @return T
      */
-    T selectOne(Wrapper<T> wrapper);
+    T findOne(Wrapper<T> wrapper);
 
     /**
      * <p>
@@ -299,7 +303,7 @@ public interface IService<T> {
      * @param wrapper 实体对象
      * @return int
      */
-    int selectCount(Wrapper<T> wrapper);
+    int count(Wrapper<T> wrapper);
 
     /**
      * <p>
@@ -319,7 +323,7 @@ public interface IService<T> {
      * @param page 翻页对象
      * @return
      */
-    Page<T> selectPage(Page<T> page);
+    Page<T> selectByPage(Page<T> page);
 
     /**
      * <p>
@@ -362,6 +366,6 @@ public interface IService<T> {
      * @param wrapper 实体包装类 {@link Wrapper}
      * @return
      */
-    Page<T> selectPage(Page<T> page, Wrapper<T> wrapper);
+    Page<T> selectByPage(Page<T> page, Wrapper<T> wrapper);
 
 }

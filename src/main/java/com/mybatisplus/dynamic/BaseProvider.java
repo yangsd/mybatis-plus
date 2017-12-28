@@ -74,29 +74,7 @@ public class BaseProvider {
         return result;
     }
 
-    /**
-     * 获取Example类 - 不在此校验是否为合法的Example类
-     *
-     * @param params
-     * @return
-     */
-    protected MetaObject getExample(Map<String, Object> params) {
-        Object result = null;
-        if (params.containsKey("example")) {
-            result = params.get("example");
-        }
-        if (result == null) {
-            return null;
-        }
-        //根据Example的结构，通过判断是否包含某些属性来判断条件是否为合法的example类型
-        MetaObject example = SystemMetaObject.forObject(result);
-        if (example.hasGetter("orderByClause")
-                && example.hasGetter("oredCriteria")
-                && example.hasGetter("distinct")) {
-            return example;
-        }
-        throw new IllegalArgumentException("Example参数不是合法的Mybatis Example对象!");
-    }
+
 
     /**
      * 根据主键查询
@@ -125,86 +103,6 @@ public class BaseProvider {
             sql.ORDER_BY((String) orderBy);
         } else if (defaultOrderByClause != null && defaultOrderByClause.length() > 0) {
             sql.ORDER_BY(defaultOrderByClause);
-        }
-    }
-
-    /**
-     * Example条件
-     */
-    protected void applyWhere(SQL sql, MetaObject example) {
-        if (example == null) {
-            return;
-        }
-        String parmPhrase1 = "%s #{example.oredCriteria[%d].allCriteria[%d].value}";
-        String parmPhrase1_th = "%s #{example.oredCriteria[%d].allCriteria[%d].value,typeHandler=%s}";
-        String parmPhrase2 = "%s #{example.oredCriteria[%d].allCriteria[%d].value} and #{example.oredCriteria[%d].criteria[%d].secondValue}";
-        String parmPhrase2_th = "%s #{example.oredCriteria[%d].allCriteria[%d].value,typeHandler=%s} and #{example.oredCriteria[%d].criteria[%d].secondValue,typeHandler=%s}";
-        String parmPhrase3 = "#{example.oredCriteria[%d].allCriteria[%d].value[%d]}";
-        String parmPhrase3_th = "#{example.oredCriteria[%d].allCriteria[%d].value[%d],typeHandler=%s}";
-
-        StringBuilder sb = new StringBuilder();
-
-        List<?> oredCriteria = (List<?>) example.getValue("oredCriteria");
-        boolean firstCriteria = true;
-        for (int i = 0; i < oredCriteria.size(); i++) {
-            MetaObject criteria = SystemMetaObject.forObject(oredCriteria.get(i));
-            List<?> criterions = (List<?>) criteria.getValue("criteria");
-            if (criterions.size() > 0) {
-                if (firstCriteria) {
-                    firstCriteria = false;
-                } else {
-                    sb.append(" or ");
-                }
-
-                sb.append('(');
-                boolean firstCriterion = true;
-                for (int j = 0; j < criterions.size(); j++) {
-                    MetaObject criterion = SystemMetaObject.forObject(criterions.get(j));
-                    if (firstCriterion) {
-                        firstCriterion = false;
-                    } else {
-                        sb.append(" and ");
-                    }
-
-                    if ((Boolean) criterion.getValue("noValue")) {
-                        sb.append(criterion.getValue("condition"));
-                    } else if ((Boolean) criterion.getValue("singleValue")) {
-                        if (criterion.getValue("typeHandler") == null) {
-                            sb.append(String.format(parmPhrase1, criterion.getValue("condition"), i, j));
-                        } else {
-                            sb.append(String.format(parmPhrase1_th, criterion.getValue("condition"), i, j, criterion.getValue("typeHandler")));
-                        }
-                    } else if ((Boolean) criterion.getValue("betweenValue")) {
-                        if (criterion.getValue("typeHandler") == null) {
-                            sb.append(String.format(parmPhrase2, criterion.getValue("condition"), i, j, i, j));
-                        } else {
-                            sb.append(String.format(parmPhrase2_th, criterion.getValue("condition"), i, j, criterion.getValue("typeHandler"), i, j, criterion.getValue("typeHandler")));
-                        }
-                    } else if ((Boolean) criterion.getValue("listValue")) {
-                        sb.append(criterion.getValue("condition"));
-                        sb.append(" (");
-                        List<?> listItems = (List<?>) criterion.getValue("value");
-                        boolean comma = false;
-                        for (int k = 0; k < listItems.size(); k++) {
-                            if (comma) {
-                                sb.append(", ");
-                            } else {
-                                comma = true;
-                            }
-                            if (criterion.getValue("typeHandler") == null) {
-                                sb.append(String.format(parmPhrase3, i, j, k));
-                            } else {
-                                sb.append(String.format(parmPhrase3_th, i, j, k, criterion.getValue("typeHandler")));
-                            }
-                        }
-                        sb.append(')');
-                    }
-                }
-                sb.append(')');
-            }
-        }
-        if (sb.length() > 0) {
-            sql.WHERE(sb.toString());
         }
     }
 
